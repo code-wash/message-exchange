@@ -4,4 +4,5 @@ public interface IDbConnector
 {
     Task<int> ExecuteCommandAsync(NonQuerySP commandSP, CancellationToken cancellationToken);
     Task<List<T>> ExecuteQueryAsync<T>(QuerySP<T> querySP, CancellationToken cancellationToken);
+    Task<T?> ExecuteQueryTop1Async<T>(QuerySP<T> querySP, CancellationToken cancellationToken);
 }

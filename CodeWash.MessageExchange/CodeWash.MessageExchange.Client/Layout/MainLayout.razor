@@ -16,8 +16,11 @@
 </div>
  *@
 
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Services.AuthService AuthService
+@inject NavigationManager Nav
 @inherits LayoutComponentBase
-@using MudBlazor
 
 <MudThemeProvider />
 
@@ -25,11 +28,15 @@
     <MudAppBar Color="Color.Primary" Elevation="4">
         <MudText Typo="Typo.h6">Message Exchange</MudText>
         <MudSpacer />
-        <MudButton Variant="Variant.Text" Color="Color.Success">Login</MudButton>
-        <MudSpacer />
-        <MudButton Variant="Variant.Text" Class="mud-theme-primary">Messages</MudButton>
-        <MudSpacer />
-        <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="Logout">Logout</MudButton>
+        @if (isUserLoggedIn){
+            <MudButton Variant="Variant.Text" Class="mud-theme-primary">Messages</MudButton>
+            <MudSpacer />
+            <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="Logout">Logout</MudButton>
+        } else {
+            <MudButton Variant="Variant.Text" Color="Color.Success">Login</MudButton>
+            <MudSpacer />
+            <MudButton Variant="Variant.Text" Class="mud-theme-primary">Register</MudButton>
+        }
     </MudAppBar>
 
     <MudMainContent>
@@ -38,8 +45,17 @@
 </MudLayout>
 
 @code {
-    private void Logout()
+    private bool isUserLoggedIn = false;
+
+    protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine("User logged out.");
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        isUserLoggedIn = authState.User.Identity?.IsAuthenticated ?? false;
+    }
+
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+        Nav.NavigateTo("/login", true);
     }
 }

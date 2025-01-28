@@ -63,7 +63,6 @@ GO
 CREATE PROCEDURE sp_AddConnection
     @Id UNIQUEIDENTIFIER,
     @UserId UNIQUEIDENTIFIER,
-    @ConnectionId NVARCHAR(256),
     @ConnectedAt DATETIME
 AS
 BEGIN
