@@ -1,0 +1,45 @@
+﻿@* @inherits LayoutComponentBase
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+ *@
+
+@inherits LayoutComponentBase
+@using MudBlazor
+
+<MudThemeProvider />
+
+<MudLayout>
+    <MudAppBar Color="Color.Primary" Elevation="4">
+        <MudText Typo="Typo.h6">Message Exchange</MudText>
+        <MudSpacer />
+        <MudButton Variant="Variant.Text" Color="Color.Success">Login</MudButton>
+        <MudSpacer />
+        <MudButton Variant="Variant.Text" Class="mud-theme-primary">Messages</MudButton>
+        <MudSpacer />
+        <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="Logout">Logout</MudButton>
+    </MudAppBar>
+
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private void Logout()
+    {
+        Console.WriteLine("User logged out.");
+    }
+}

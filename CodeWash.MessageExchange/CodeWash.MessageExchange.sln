@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWash.MessageExchange.Do
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWash.MessageExchange.DataAccess", "CodeWash.MessageExchange.DataAccess\CodeWash.MessageExchange.DataAccess.csproj", "{E7F4EF12-7BD9-49CD-9FB2-F353B562AB80}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWash.MessageExchange.Tests", "CodeWash.MessageExchange.Tests\CodeWash.MessageExchange.Tests.csproj", "{23F3D82B-42BB-432C-80FF-1EC52B8F469B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWash.MessageExchange.Client", "CodeWash.MessageExchange.Client\CodeWash.MessageExchange.Client.csproj", "{2B931C12-467D-4746-8E07-548B022786E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{E7F4EF12-7BD9-49CD-9FB2-F353B562AB80}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7F4EF12-7BD9-49CD-9FB2-F353B562AB80}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7F4EF12-7BD9-49CD-9FB2-F353B562AB80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23F3D82B-42BB-432C-80FF-1EC52B8F469B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23F3D82B-42BB-432C-80FF-1EC52B8F469B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23F3D82B-42BB-432C-80FF-1EC52B8F469B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23F3D82B-42BB-432C-80FF-1EC52B8F469B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B931C12-467D-4746-8E07-548B022786E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B931C12-467D-4746-8E07-548B022786E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B931C12-467D-4746-8E07-548B022786E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B931C12-467D-4746-8E07-548B022786E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

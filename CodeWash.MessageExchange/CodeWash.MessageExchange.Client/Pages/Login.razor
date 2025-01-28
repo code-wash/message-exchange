@@ -1,0 +1,55 @@
+﻿@page "/login"
+@using MudBlazor
+@inject Services.AuthService AuthService
+@inject NavigationManager Nav
+
+<MudPaper Elevation="4" Class="pa-4">
+    <MudText Typo="Typo.h5" Class="mb-4">Login</MudText>
+
+    <MudTextField Label="Email" @bind-Value="_email" Required="true" />
+    <MudTextField Label="Password" @bind-Value="_password" InputType="InputType.Password" Required="true" />
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleLogin" Disabled="_loading">
+        @(_loading ? "Logging in..." : "LOGIN")
+    </MudButton>
+
+    <MudAlert Severity="Severity.Error" Style="margin-top: 10px;" @bind-Visible="_showError">
+        Invalid email or password!
+    </MudAlert>
+</MudPaper>
+
+@code {
+    private string _email = string.Empty;
+    private string _password = string.Empty;
+    private bool _showError = false;
+    private bool _loading = false;
+
+    private async Task HandleLogin()
+    {
+        _loading = true;
+        _showError = false;
+
+        try
+        {
+            var response = await AuthService.LoginAsync(_email, _password);
+
+            if (response)
+            {
+                Nav.NavigateTo("/messages", true);
+            }
+            else
+            {
+                _showError = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Login Error: {ex.Message}");
+            _showError = true;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}
