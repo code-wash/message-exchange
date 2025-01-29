@@ -1,3 +1,3 @@
 ﻿namespace CodeWash.MessageExchange.Dtos.QueryDtos;
-public record GetMessagesBetweenUsersVM(Guid Id, Guid SenderId, Guid ReceiverId, string Content, DateTime Timestamp, bool IsRead)
+public record GetMessagesBetweenUsersVM(string Content, DateTime Timestamp, string SenderEmail)
     : IQueryVM;

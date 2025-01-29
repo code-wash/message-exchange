@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
 
@@ -18,9 +19,18 @@ public class CustomAuthStateProvider(LocalStorage localStorage) : Authentication
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
         }
 
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+        var emailClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+        if (string.IsNullOrEmpty(emailClaim))
+        {
+            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+        }
+
         Claim[] claims =
         [
-            new(ClaimTypes.Name, "User")
+            new(ClaimTypes.Email, emailClaim)
         ];
 
         ClaimsIdentity identity = new(claims, "jwt");
@@ -34,7 +44,7 @@ public class CustomAuthStateProvider(LocalStorage localStorage) : Authentication
 
         Claim[] claims =
         [
-            new(ClaimTypes.Name, email)
+            new(ClaimTypes.Email, email)
         ];
 
         ClaimsIdentity identity = new(claims, "jwt");

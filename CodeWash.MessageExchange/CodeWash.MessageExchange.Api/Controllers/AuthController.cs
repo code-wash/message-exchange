@@ -74,13 +74,13 @@ public class AuthController(IDbConnector dbConnector, IConfiguration configurati
 
         Claim[] claims =
         [
-            new(ClaimTypes.Name, email)
+            new(ClaimTypes.Email, email)
         ];
 
         SymmetricSecurityKey securityKey = new(key);
         SigningCredentials credentials = new(securityKey, SecurityAlgorithms.HmacSha256);
 
-        JwtSecurityToken token = new(issuer, audience, claims, expires: DateTime.UtcNow.AddHours(2), signingCredentials: credentials);
+        JwtSecurityToken token = new(issuer, audience, claims, expires: DateTime.UtcNow.AddDays(1), signingCredentials: credentials);
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

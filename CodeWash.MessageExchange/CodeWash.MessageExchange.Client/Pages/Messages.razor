@@ -1,6 +1,7 @@
 ﻿@page "/messages"
 @using CodeWash.MessageExchange.Dtos.QueryDtos
 @using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
 @inject Services.UserService UserService
 @inject Services.MessageService MessageService
 @inject AuthenticationStateProvider AuthProvider
@@ -33,8 +34,11 @@
                 <MudList T="GetMessagesBetweenUsersVM" Style="height: 400px; overflow-y: auto;">
                     @foreach (var message in _messages)
                     {
-                        <MudListItem Class="message-item">
+                        <MudListItem Class="@GetMessageClass(message.SenderEmail)">
                             <MudText>@message.Content</MudText>
+                            <MudText Typo="Typo.caption" Class="text-muted timestamp">
+                                @message.Timestamp.ToString("HH:mm")
+                            </MudText>
                         </MudListItem>
                     }
                 </MudList>
@@ -58,18 +62,22 @@
     private GetUsersExceptCurrentVM? _selectedRecipient;
     private string _newMessage = string.Empty;
     private List<GetMessagesBetweenUsersVM> _messages = [];
+    private bool _messagesIsLoading = false;
     private bool _messageIsSending = false;
+    private string _currentUserEmail = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         _users = await UserService.GetUsersExceptCurrentAsync();
+
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        _currentUserEmail = authState.User.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty;
     }
 
     private async Task SelectUser(GetUsersExceptCurrentVM user)
     {
         _selectedRecipient = user;
-        _messages.Clear();
-        _messages = await MessageService.GetMessagesBetweenUsersAsync(user.Email);
+        await LoadMessagesForSelectedUser();
     }
 
     private async Task SendMessage()
@@ -82,7 +90,7 @@
             {
                 await MessageService.SendMessageAsync(_selectedRecipient.Email, _newMessage);
                 _newMessage = string.Empty;
-                await SelectUser(_selectedRecipient);
+                await LoadMessagesForSelectedUser();
             }
         }
         finally
@@ -90,4 +98,50 @@
             _messageIsSending = false;
         }
     }
+
+    private async Task LoadMessagesForSelectedUser()
+    {
+        _messagesIsLoading = true;
+
+        try
+        {
+            _messages.Clear();
+            _messages = await MessageService.GetMessagesBetweenUsersAsync(_selectedRecipient!.Email);
+        }
+        finally
+        {
+            _messagesIsLoading = false;
+        }
+    }
+
+    private string GetMessageClass(string senderEmail)
+    {
+        return "message-item " +
+            (senderEmail == _currentUserEmail ? "sent-message" : "received-message");
+    }
 }
+
+    <style>
+    .message-item {
+        max-width: 60%;
+        padding: 10px;
+        border-radius: 10px;
+        margin: 5px;
+        word-wrap: break-word;
+    }
+
+    .sent-message {
+        background-color: #d4f8c6; /* Light green */
+        align-self: flex-end;
+        float: right;
+        text-align: left; /* ✅ Fix: Align text left inside bubble */
+    }
+
+    .received-message {
+        background-color: #ffffff; /* White */
+        border: 1px solid #ccc;
+        align-self: flex-start;
+        float: left;
+        text-align: left; /* ✅ Align text left for consistency */
+    }
+    </style>

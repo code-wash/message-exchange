@@ -74,5 +74,4 @@ public class MessageController(IDbConnector dbConnector) : BaseApiController
         GetUserByEmailVM? user = await dbConnector.ExecuteQueryTop1Async(new GetUserByEmailSP(email), cancellationToken);
         return user?.Id ?? throw new Exception("User not found.");
     }
-
 }

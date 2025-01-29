@@ -18,12 +18,9 @@ public class GetMessagesBetweenUsersSP(Guid userId1, Guid userId2) : QuerySP<Get
     {
         return new GetMessagesBetweenUsersVM
         (
-            Id: reader.GetGuid(reader.GetOrdinal("Id")),
-            SenderId: reader.GetGuid(reader.GetOrdinal("SenderId")),
-            ReceiverId: reader.GetGuid(reader.GetOrdinal("ReceiverId")),
             Content: reader.GetString(reader.GetOrdinal("Content")),
             Timestamp: reader.GetDateTime(reader.GetOrdinal("Timestamp")),
-            IsRead: reader.GetBoolean(reader.GetOrdinal("IsRead"))
+            SenderEmail: reader.GetString(reader.GetOrdinal("SenderEmail"))
         );
     }
 }

@@ -5,5 +5,5 @@ namespace CodeWash.MessageExchange.Api.Controllers;
 
 public abstract class BaseApiController : ControllerBase
 {
-    protected string? CurrentUserEmail => User.FindFirst(ClaimTypes.Name)?.Value;
+    protected string? CurrentUserEmail => User.FindFirst(ClaimTypes.Email)?.Value;
 }
