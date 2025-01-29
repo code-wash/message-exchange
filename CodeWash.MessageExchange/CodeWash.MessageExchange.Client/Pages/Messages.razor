@@ -17,7 +17,10 @@
                 @foreach (var user in _users)
                 {
                     <MudListItem Class="user-list-item" @onclick="() => SelectUser(user)">
-                        <MudText>@user.Email</MudText>
+                        <span>@user.Email</span>
+                        @if (user.UnreadMessagesCount > 0){
+                            <span style="text-align:right; float: right; color:red">@user.UnreadMessagesCount</span>
+                        }
                     </MudListItem>
                 }
             </MudList>

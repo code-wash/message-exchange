@@ -18,7 +18,8 @@ public class GetUsersExceptCurrentSP(string currentUserEmail) : QuerySP<GetUsers
         return new GetUsersExceptCurrentVM
         (
             Id: reader.GetGuid(reader.GetOrdinal("Id")),
-            Email: reader.GetString(reader.GetOrdinal("Email"))
+            Email: reader.GetString(reader.GetOrdinal("Email")),
+            UnreadMessagesCount: reader.GetInt32(reader.GetOrdinal("UnreadMessagesCount"))
         );
     }
 }
