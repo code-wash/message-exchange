@@ -7,10 +7,11 @@ namespace CodeWash.MessageExchange.Client.Services;
 public class CustomAuthStateProvider(LocalStorage localStorage) : AuthenticationStateProvider
 {
     private readonly LocalStorage localStorage = localStorage;
+    private const string AuthTokenKey = "authToken";
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        string? token = await localStorage.GetItemAsync("authToken");
+        string? token = await localStorage.GetItemAsync(AuthTokenKey);
 
         if (string.IsNullOrEmpty(token))
         {
@@ -29,7 +30,7 @@ public class CustomAuthStateProvider(LocalStorage localStorage) : Authentication
 
     public async Task MarkUserAsAuthenticatedAsync(string email, string token)
     {
-        await localStorage.SetItemAsync("authToken", token);
+        await localStorage.SetItemAsync(AuthTokenKey, token);
 
         Claim[] claims =
         [
@@ -43,13 +44,13 @@ public class CustomAuthStateProvider(LocalStorage localStorage) : Authentication
 
     public async Task MarkUserAsLoggedOutAsync()
     {
-        await localStorage.RemoveItemAsync("authToken");
+        await localStorage.RemoveItemAsync(AuthTokenKey);
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(new ClaimsPrincipal())));
     }
 
     public async Task AddAuthorizationToken(HttpRequestHeaders requestHeaders)
     {
-        string? token = await localStorage.GetItemAsync("authToken");
+        string? token = await localStorage.GetItemAsync(AuthTokenKey);
 
         if (!string.IsNullOrEmpty(token))
         {

@@ -11,7 +11,6 @@ builder.Services.AddMudServices();
 
 builder.Services.AddScoped<CustomAuthorizationHandler>();
 
-//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7216/") });
 builder.Services.AddHttpClient("ApiClient", client =>
 {
     client.BaseAddress = new Uri("https://localhost:7216/");

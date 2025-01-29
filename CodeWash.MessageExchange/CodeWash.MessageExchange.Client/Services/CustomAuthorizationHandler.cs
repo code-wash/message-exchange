@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Net;
-using System.Net.Http.Headers;
 
 namespace CodeWash.MessageExchange.Client.Services;
 
@@ -16,7 +15,6 @@ public class CustomAuthorizationHandler(AuthenticationStateProvider authenticati
 
         HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
 
-        // If unauthorized or forbidden, redirect to login
         if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
         {
             await authenticationStateProvider.MarkUserAsLoggedOutAsync();
