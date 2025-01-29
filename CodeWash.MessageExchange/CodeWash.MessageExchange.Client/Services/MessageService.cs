@@ -4,9 +4,9 @@ using System.Net.Http.Json;
 
 namespace CodeWash.MessageExchange.Client.Services;
 
-public class UserService(HttpClient httpClient, LocalStorageService localStorageService)
+public class MessageService(HttpClient httpClient, LocalStorageService localStorageService)
 {
-    public async Task<List<GetUsersExceptCurrentVM>> GetUsersExceptCurrentAsync()
+    public async Task<List<GetMessagesBetweenUsersVM>> GetMessagesBetweenUsersAsync(string email)
     {
         var token = await localStorageService.GetItemAsync("authToken");
 
@@ -15,7 +15,8 @@ public class UserService(HttpClient httpClient, LocalStorageService localStorage
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
-        return await httpClient.GetFromJsonAsync<List<GetUsersExceptCurrentVM>>("api/users/except-current")
-            ?? [];
+        string requestUri = $"api/messages/between-users?UserEmail={Uri.EscapeDataString(email)}";
+
+        return await httpClient.GetFromJsonAsync<List<GetMessagesBetweenUsersVM>>(requestUri) ?? [];
     }
 }

@@ -29,6 +29,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<LocalStorageService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<MessageService>();
 
 builder.Services.AddAuthorizationCore();
 

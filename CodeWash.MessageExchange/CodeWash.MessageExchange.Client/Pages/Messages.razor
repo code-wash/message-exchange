@@ -2,6 +2,7 @@
 @using CodeWash.MessageExchange.Dtos.QueryDtos
 @using Microsoft.AspNetCore.Components.Authorization
 @inject Services.UserService UserService
+@inject Services.MessageService MessageService
 @inject AuthenticationStateProvider AuthProvider
 
 <MudGrid>
@@ -29,11 +30,11 @@
                 <MudDivider Class="mb-3" />
 
                 <!-- Messages List -->
-                <MudList T="string" Style="height: 400px; overflow-y: auto;">
-                    @foreach (var msg in _messages)
+                <MudList T="GetMessagesBetweenUsersVM" Style="height: 400px; overflow-y: auto;">
+                    @foreach (var message in _messages)
                     {
                         <MudListItem Class="message-item">
-                            <MudText>@msg</MudText>
+                            <MudText>@message.Content</MudText>
                         </MudListItem>
                     }
                 </MudList>
@@ -54,25 +55,26 @@
     private List<GetUsersExceptCurrentVM> _users = [];
     private GetUsersExceptCurrentVM? _selectedRecipient;
     private string _message = string.Empty;
-    private List<string> _messages = [];
+    private List<GetMessagesBetweenUsersVM> _messages = [];
 
     protected override async Task OnInitializedAsync()
     {
         _users = await UserService.GetUsersExceptCurrentAsync();
     }
 
-    private void SelectUser(GetUsersExceptCurrentVM user)
+    private async Task SelectUser(GetUsersExceptCurrentVM user)
     {
         _selectedRecipient = user;
         _messages.Clear();
+        _messages = await MessageService.GetMessagesBetweenUsersAsync(user.Email);
     }
 
     private async Task SendMessage()
     {
-        if (!string.IsNullOrEmpty(_message) && _selectedRecipient != null)
-        {
-            _messages.Add($"You: {_message}");
-            _message = string.Empty;
-        }
+        // if (!string.IsNullOrEmpty(_message) && _selectedRecipient != null)
+        // {
+        //     _messages.Add($"You: {_message}");
+        //     _message = string.Empty;
+        // }
     }
 }

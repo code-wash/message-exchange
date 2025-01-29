@@ -10,19 +10,18 @@ namespace CodeWash.MessageExchange.Api.Controllers;
 [Route("api/users")]
 [ApiController]
 [Authorize]
-public class UserController(IDbConnector dbConnector) : ControllerBase
+public class UserController(IDbConnector dbConnector) : BaseApiController
 {
     [HttpGet("except-current")]
-    public async Task<IActionResult> GetUsersExceptCurrent(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetUsersExceptCurrentAsync(CancellationToken cancellationToken)
     {
-        string? currentUserEmail = User.FindFirst(ClaimTypes.Name)?.Value;
-        if (string.IsNullOrEmpty(currentUserEmail))
+        if (string.IsNullOrEmpty(CurrentUserEmail))
         {
             return Unauthorized("Invalid or missing User Email claim.");
         }
 
         List<GetUsersExceptCurrentVM> users = await dbConnector.ExecuteQueryAsync(
-            new GetUsersExceptCurrentSP(currentUserEmail), cancellationToken
+            new GetUsersExceptCurrentSP(CurrentUserEmail), cancellationToken
         );
 
         return Ok(users);
