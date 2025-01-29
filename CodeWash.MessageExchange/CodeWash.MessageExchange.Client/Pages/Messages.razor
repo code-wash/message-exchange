@@ -14,14 +14,24 @@
         <MudPaper Elevation="4" Class="pa-2" Style="height: 100vh; overflow-y: auto;">
             <MudText Typo="Typo.h6" Class="mb-2">Users</MudText>
             <MudList T="GetUsersExceptCurrentVM">
-                @foreach (var user in _users)
+                @if (_usersIsLoading)
                 {
-                    <MudListItem Class="user-list-item" @onclick="() => SelectUser(user)">
-                        <span>@user.Email</span>
-                        @if (user.UnreadMessagesCount > 0){
-                            <span style="text-align:right; float: right; color:red">@user.UnreadMessagesCount</span>
-                        }
+                    <MudListItem Class="user-list-item">
+                        <MudText>(Loading users...)</MudText>
                     </MudListItem>
+                }
+                else
+                {
+                    @foreach (var user in _users)
+                    {
+                        <MudListItem Class="user-list-item" @onclick="() => SelectUser(user)">
+                            <span>@user.Email</span>
+                            @if (user.UnreadMessagesCount > 0)
+                            {
+                                <span style="text-align:right; float: right; color:red">@user.UnreadMessagesCount</span>
+                            }
+                        </MudListItem>
+                    }
                 }
             </MudList>
         </MudPaper>
@@ -76,6 +86,7 @@
     private GetUsersExceptCurrentVM? _selectedRecipient;
     private string _newMessage = string.Empty;
     private List<GetMessagesBetweenUsersVM> _messages = [];
+    private bool _usersIsLoading = false;
     private bool _messagesIsLoading = false;
     private bool _messageIsSending = false;
     private string _currentUserEmail = string.Empty;
@@ -86,15 +97,12 @@
         var authState = await AuthProvider.GetAuthenticationStateAsync();
         _currentUserEmail = authState.User.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty;
 
-        _users = await UserService.GetUsersExceptCurrentAsync();
-
-        // await MessageService.StartConnectionAsync();
-        // MessageService.OnMessageReceived += HandleIncomingMessage;
+        await LoadUsers();
 
         if (hubConnection is null)
         {
             var token = await ((CustomAuthStateProvider)AuthProvider).GetTokenAsync();
-            
+
             hubConnection = new HubConnectionBuilder()
                 .WithUrl($"https://localhost:7216/messageHub", options =>
                 {
@@ -114,15 +122,32 @@
         }
     }
 
-    private void HandleIncomingMessage(string senderEmail, string message, string timestamp)
+    private async void HandleIncomingMessage(string senderEmail, string message, string timestamp)
     {
         Console.WriteLine($"[SignalR] Received message from {senderEmail}: {message} at {timestamp}");
-        
+
         if (_selectedRecipient != null && _selectedRecipient.Email == senderEmail)
         {
             bool isParsed = DateTime.TryParse(timestamp, out DateTime parsedTimestamp);
             _messages.Add(new GetMessagesBetweenUsersVM(message, isParsed ? parsedTimestamp : DateTime.UtcNow, senderEmail));
-            StateHasChanged();
+        }
+
+        await LoadUsers();
+        StateHasChanged();
+    }
+
+    private async Task LoadUsers()
+    {
+        _usersIsLoading = true;
+
+        try
+        {
+            _users.Clear();
+            _users = await UserService.GetUsersExceptCurrentAsync();
+        }
+        finally
+        {
+            _usersIsLoading = false;
         }
     }
 
@@ -130,6 +155,11 @@
     {
         _selectedRecipient = user;
         await LoadMessagesForSelectedUser();
+        if (_selectedRecipient.UnreadMessagesCount > 0)
+        {
+            await MessageService.ReadMessagesAsync(_selectedRecipient!.Email);
+            await LoadUsers();
+        }
     }
 
     private async Task SendMessage()
@@ -143,6 +173,7 @@
                 await MessageService.SendMessageAsync(_selectedRecipient.Email, _newMessage);
                 _newMessage = string.Empty;
                 await LoadMessagesForSelectedUser();
+                await LoadUsers();
             }
         }
         finally

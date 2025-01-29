@@ -4,13 +4,13 @@ using Microsoft.Data.SqlClient;
 
 namespace CodeWash.MessageExchange.DataAccess.StoredProcedures.Queries;
 
-public class GetUsersExceptCurrentSP(string currentUserEmail) : QuerySP<GetUsersExceptCurrentVM>
+public class GetUsersExceptCurrentSP(Guid CurrentUserId) : QuerySP<GetUsersExceptCurrentVM>
 {
     public override string ProcedureName => "sp_GetUsersExceptCurrent";
 
     public override Dictionary<string, object> Parameters => new()
     {
-        { "@CurrentUserEmail", currentUserEmail },
+        { "@CurrentUserId", CurrentUserId },
     };
 
     public override GetUsersExceptCurrentVM ReadEntity(SqlDataReader reader)

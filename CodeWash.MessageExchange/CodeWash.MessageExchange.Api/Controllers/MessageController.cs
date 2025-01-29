@@ -15,7 +15,7 @@ namespace CodeWash.MessageExchange.Api.Controllers;
 [Route("api/messages")]
 [ApiController]
 [Authorize]
-public class MessageController(IDbConnector dbConnector, IHubContext<MessageHub> hubContext) : BaseApiController
+public class MessageController(IDbConnector dbConnector, IHubContext<MessageHub> hubContext) : BaseApiController(dbConnector)
 {
     [HttpGet("between-users")]
     public async Task<IActionResult> GetMessagesBetweenUsersAsync([FromQuery] GetMessagesBetweenUsersRequestDto requestDto, CancellationToken cancellationToken)
@@ -78,9 +78,26 @@ public class MessageController(IDbConnector dbConnector, IHubContext<MessageHub>
         return Ok("Message sent successfully.");
     }
 
-    private async Task<Guid> GetUserIdByEmailAsync(string email, CancellationToken cancellationToken)
+    [HttpPost("messages-read")]
+    public async Task<IActionResult> ReadMessagesAsync([FromBody] ReadMessagesRequestDto request, CancellationToken cancellationToken)
     {
-        GetUserByEmailVM? user = await dbConnector.ExecuteQueryTop1Async(new GetUserByEmailSP(email), cancellationToken);
-        return user?.Id ?? throw new Exception("User not found.");
+        if (CurrentUserEmail is null)
+        {
+            return Unauthorized("Invalid token.");
+        }
+
+        if (CurrentUserEmail.Equals(request.UserEmail, StringComparison.OrdinalIgnoreCase))
+        {
+            return Ok();
+        }
+
+        ReadMessagesSP readMessagesSP = new(
+            SenderUserId: await GetUserIdByEmailAsync(request.UserEmail, cancellationToken),
+            ReaderUserId: await GetUserIdByEmailAsync(CurrentUserEmail, cancellationToken)
+        );
+
+        _ = await dbConnector.ExecuteCommandAsync(readMessagesSP, cancellationToken);
+
+        return Ok();
     }
 }

@@ -16,7 +16,7 @@ namespace CodeWash.MessageExchange.Api.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class AuthController(IDbConnector dbConnector, IConfiguration configuration) : BaseApiController
+public class AuthController(IDbConnector dbConnector, IConfiguration configuration) : BaseApiController(dbConnector)
 {
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto request, CancellationToken cancellationToken)

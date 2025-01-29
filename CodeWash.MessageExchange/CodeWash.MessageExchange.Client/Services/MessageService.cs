@@ -1,8 +1,10 @@
-﻿using CodeWash.MessageExchange.Dtos.ApiDtos.MessageDtos;
+﻿using CodeWash.MessageExchange.Client.Pages;
+using CodeWash.MessageExchange.Dtos.ApiDtos.MessageDtos;
 using CodeWash.MessageExchange.Dtos.QueryDtos;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Net.Http.Json;
+using static MudBlazor.Colors;
 
 namespace CodeWash.MessageExchange.Client.Services;
 
@@ -43,25 +45,22 @@ public class MessageService(IHttpClientFactory httpClientFactory, Authentication
         }
     }
 
-    public async Task<List<GetMessagesBetweenUsersVM>> GetMessagesBetweenUsersAsync(string email)
-    {
-        string requestUri = $"api/messages/between-users?UserEmail={Uri.EscapeDataString(email)}";
-
-        return await httpClient.GetFromJsonAsync<List<GetMessagesBetweenUsersVM>>(requestUri) ?? [];
-    }
-
     public async Task<bool> SendMessageAsync(string receiverEmail, string message)
     {
         SendMessageDto messageDto = new(receiverEmail, message);
         HttpResponseMessage response = await httpClient.PostAsJsonAsync("api/messages/send", messageDto);
 
-        //if (hubConnection is { State: HubConnectionState.Connected })
-        //{
-        //    var timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
-
-        //    await hubConnection.SendAsync("SendMessage", receiverEmail, message, timestamp);
-        //}
-
         return response.IsSuccessStatusCode;
+    }
+
+    public async Task<List<GetMessagesBetweenUsersVM>> GetMessagesBetweenUsersAsync(string email)
+    {
+        string requestUri = $"api/messages/between-users?UserEmail={Uri.EscapeDataString(email)}";
+        return await httpClient.GetFromJsonAsync<List<GetMessagesBetweenUsersVM>>(requestUri) ?? [];
+    }
+
+    public async Task ReadMessagesAsync(string email)
+    {
+        await httpClient.PostAsJsonAsync("api/messages/messages-read", new ReadMessagesRequestDto(email));
     }
 }
