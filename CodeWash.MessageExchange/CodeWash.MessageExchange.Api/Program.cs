@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton(builder.Configuration);
 
@@ -22,7 +22,7 @@ builder.Services.AddCors(setup =>
 });
 
 // NOTE: Add JWT Authentication
-var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
+byte[] key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -42,7 +42,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddDataAccessServices();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 app.UseMiddleware<ErrorHandlerMiddleware>();
 

@@ -71,10 +71,9 @@
 
     private async Task SendMessage()
     {
-        // if (!string.IsNullOrEmpty(_message) && _selectedRecipient != null)
-        // {
-        //     _messages.Add($"You: {_message}");
-        //     _message = string.Empty;
-        // }
+        if (!string.IsNullOrEmpty(_message) && _selectedRecipient != null)
+        {
+            await MessageService.SendMessageAsync(_selectedRecipient.Email, _message);
+        }
     }
 }

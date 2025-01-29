@@ -9,7 +9,7 @@ public abstract class BaseSP
 
     protected void SetParameters(SqlCommand command)
     {
-        foreach (var parameter in Parameters ?? [])
+        foreach (KeyValuePair<string, object> parameter in Parameters ?? [])
         {
             command.Parameters.AddWithValue(parameter.Key, parameter.Value);
         }

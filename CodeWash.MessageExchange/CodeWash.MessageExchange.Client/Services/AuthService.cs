@@ -5,8 +5,11 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace CodeWash.MessageExchange.Client.Services;
 
-public class AuthService(HttpClient httpClient, AuthenticationStateProvider authStateProvider, LocalStorageService localStorage)
+public class AuthService(IHttpClientFactory httpClientFactory, AuthenticationStateProvider authenticationStateProvider)
+    : BaseService(httpClientFactory)
 {
+    private readonly CustomAuthStateProvider authenticationStateProvider = (CustomAuthStateProvider)authenticationStateProvider;
+
     public async Task<bool> LoginAsync(string email, string password)
     {
         LoginRequestDto loginRequest = new(Email: email, Password: password);
@@ -15,13 +18,13 @@ public class AuthService(HttpClient httpClient, AuthenticationStateProvider auth
 
         if (!response.IsSuccessStatusCode)
         {
-            return false; // Invalid credentials
+            // NOTE: Invalid credentials
+            return false;
         }
 
-        var token = await response.Content.ReadAsStringAsync();
-        await localStorage.SetItemAsync("authToken", token);
+        string token = await response.Content.ReadAsStringAsync();
 
-        ((CustomAuthStateProvider)authStateProvider).MarkUserAsAuthenticated(email);
+        await authenticationStateProvider.MarkUserAsAuthenticatedAsync(email, token);
 
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return true;
@@ -29,8 +32,7 @@ public class AuthService(HttpClient httpClient, AuthenticationStateProvider auth
 
     public async Task LogoutAsync()
     {
-        await localStorage.RemoveItemAsync("authToken");
-        await ((CustomAuthStateProvider)authStateProvider).MarkUserAsLoggedOutAsync();
+        await authenticationStateProvider.MarkUserAsLoggedOutAsync();
         httpClient.DefaultRequestHeaders.Authorization = null;
     }
 

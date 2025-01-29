@@ -10,8 +10,8 @@ public class ConnectionRepository(string connectionString) : IConnectionReposito
 {
     public async Task<bool> CreateConnectionAsync(Connection connection, CancellationToken cancellationToken)
     {
-        using var sqlConnection = new SqlConnection(connectionString);
-        using var command = new SqlCommand("sp_CreateConnection", sqlConnection)
+        using SqlConnection sqlConnection = new(connectionString);
+        using SqlCommand command = new("sp_CreateConnection", sqlConnection)
         {
             CommandType = CommandType.StoredProcedure
         };
@@ -20,14 +20,14 @@ public class ConnectionRepository(string connectionString) : IConnectionReposito
         command.Parameters.AddWithValue("@ConnectedAt", connection.ConnectedAt);
 
         await sqlConnection.OpenAsync(cancellationToken);
-        var rowsAffected = await command.ExecuteNonQueryAsync(cancellationToken);
+        int rowsAffected = await command.ExecuteNonQueryAsync(cancellationToken);
         return rowsAffected > 0;
     }
 
     public async Task<bool> UpdateConnectionAsync(Guid connectionId, DateTime disconnectedAt, CancellationToken cancellationToken)
     {
-        using var sqlConnection = new SqlConnection(connectionString);
-        using var command = new SqlCommand("sp_DisconnectUser", sqlConnection)
+        using SqlConnection sqlConnection = new(connectionString);
+        using SqlCommand command = new("sp_DisconnectUser", sqlConnection)
         {
             CommandType = CommandType.StoredProcedure
         };
@@ -35,7 +35,7 @@ public class ConnectionRepository(string connectionString) : IConnectionReposito
         command.Parameters.AddWithValue("@DisconnectedAt", disconnectedAt);
 
         await sqlConnection.OpenAsync(cancellationToken);
-        var rowsAffected = await command.ExecuteNonQueryAsync(cancellationToken);
+        int rowsAffected = await command.ExecuteNonQueryAsync(cancellationToken);
         return rowsAffected > 0;
     }
 }

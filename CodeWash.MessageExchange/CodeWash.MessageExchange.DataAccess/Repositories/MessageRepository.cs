@@ -10,10 +10,10 @@ public class MessageRepository(string connectionString) : IMessageRepository
 {
     public async Task<IEnumerable<Message>> GetMessagesBetweenUsersAsync(Guid userId1, Guid userId2, CancellationToken cancellationToken)
     {
-        var messages = new List<Message>();
+        List<Message> messages = [];
 
-        using var connection = new SqlConnection(connectionString);
-        using var command = new SqlCommand("sp_GetMessagesBetweenUsers", connection)
+        using SqlConnection connection = new(connectionString);
+        using SqlCommand command = new("sp_GetMessagesBetweenUsers", connection)
         {
             CommandType = CommandType.StoredProcedure
         };
@@ -21,7 +21,7 @@ public class MessageRepository(string connectionString) : IMessageRepository
         command.Parameters.AddWithValue("@UserId2", userId2);
 
         await connection.OpenAsync(cancellationToken);
-        using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        using SqlDataReader reader = await command.ExecuteReaderAsync(cancellationToken);
 
         while (await reader.ReadAsync(cancellationToken))
         {
@@ -41,8 +41,8 @@ public class MessageRepository(string connectionString) : IMessageRepository
 
     public async Task<bool> CreateMessageAsync(Message message, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(connectionString);
-        using var command = new SqlCommand("sp_CreateMessage", connection)
+        using SqlConnection connection = new(connectionString);
+        using SqlCommand command = new("sp_CreateMessage", connection)
         {
             CommandType = CommandType.StoredProcedure
         };
@@ -53,7 +53,7 @@ public class MessageRepository(string connectionString) : IMessageRepository
         command.Parameters.AddWithValue("@Timestamp", message.Timestamp);
 
         await connection.OpenAsync(cancellationToken);
-        var rowsAffected = await command.ExecuteNonQueryAsync(cancellationToken);
+        int rowsAffected = await command.ExecuteNonQueryAsync(cancellationToken);
         return rowsAffected > 0;
     }
 }

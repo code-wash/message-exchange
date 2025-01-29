@@ -2,7 +2,7 @@
 
 namespace CodeWash.MessageExchange.Client.Services;
 
-public class LocalStorageService(IJSRuntime jsRuntime)
+public class LocalStorage(IJSRuntime jsRuntime)
 {
     public async Task SetItemAsync(string key, string value) =>
         await jsRuntime.InvokeVoidAsync("localStorage.setItem", key, value);

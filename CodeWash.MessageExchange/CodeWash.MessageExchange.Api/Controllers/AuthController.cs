@@ -3,6 +3,7 @@ using CodeWash.MessageExchange.DataAccess.StoredProcedures.Commands;
 using CodeWash.MessageExchange.DataAccess.StoredProcedures.Queries;
 using CodeWash.MessageExchange.Domain.Entities;
 using CodeWash.MessageExchange.Dtos.ApiDtos.AuthDtos;
+using CodeWash.MessageExchange.Dtos.QueryDtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -23,18 +24,15 @@ public class AuthController(IDbConnector dbConnector, IConfiguration configurati
             return BadRequest("Email and password are required.");
         }
 
-        // Fetch user from the database
-        var user = await dbConnector.ExecuteQueryTop1Async(new GetUserByEmailSP(request.Email), cancellationToken);
+        GetUserByEmailVM? user = await dbConnector.ExecuteQueryTop1Async(new GetUserByEmailSP(request.Email), cancellationToken);
 
         if (user is null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
         {
             return Unauthorized("Invalid email or password.");
         }
 
-        // Generate JWT Token
-        var token = GenerateJwtToken(user.Email, configuration);
+        string token = GenerateJwtToken(user.Email, configuration);
 
-        // Register user connection
         await dbConnector.ExecuteCommandAsync(new CreateConnectionSP(new Connection { UserId = user.Id }), cancellationToken);
 
         return Ok(token);
@@ -49,7 +47,7 @@ public class AuthController(IDbConnector dbConnector, IConfiguration configurati
         }
 
         // NOTE: Check if the user already exists
-        var existingUsers = await dbConnector.ExecuteQueryAsync(new GetUserByEmailSP(request.Email), cancellationToken);
+        List<GetUserByEmailVM> existingUsers = await dbConnector.ExecuteQueryAsync(new GetUserByEmailSP(request.Email), cancellationToken);
         if (existingUsers.Count != 0)
         {
             return Conflict("User with this email already exists.");
@@ -70,19 +68,19 @@ public class AuthController(IDbConnector dbConnector, IConfiguration configurati
 
     private static string GenerateJwtToken(string email, IConfiguration configuration)
     {
-        var key = Encoding.UTF8.GetBytes(configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT key is missing"));
-        var issuer = configuration["Jwt:Issuer"];
-        var audience = configuration["Jwt:Audience"];
+        byte[] key = Encoding.UTF8.GetBytes(configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT key is missing"));
+        string? issuer = configuration["Jwt:Issuer"];
+        string? audience = configuration["Jwt:Audience"];
 
-        var claims = new[]
-        {
-            new Claim(ClaimTypes.Name, email)
-        };
+        Claim[] claims =
+        [
+            new(ClaimTypes.Name, email)
+        ];
 
-        var securityKey = new SymmetricSecurityKey(key);
-        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+        SymmetricSecurityKey securityKey = new(key);
+        SigningCredentials credentials = new(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var token = new JwtSecurityToken(issuer, audience, claims, expires: DateTime.UtcNow.AddHours(2), signingCredentials: credentials);
+        JwtSecurityToken token = new(issuer, audience, claims, expires: DateTime.UtcNow.AddHours(2), signingCredentials: credentials);
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

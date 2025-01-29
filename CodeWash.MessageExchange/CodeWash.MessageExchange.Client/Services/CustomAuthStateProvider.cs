@@ -1,44 +1,59 @@
-﻿using System.Security.Claims;
+﻿using System.Net.Http.Headers;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace CodeWash.MessageExchange.Client.Services;
 
-public class CustomAuthStateProvider(LocalStorageService localStorageService) : AuthenticationStateProvider
+public class CustomAuthStateProvider(LocalStorage localStorage) : AuthenticationStateProvider
 {
+    private readonly LocalStorage localStorage = localStorage;
+
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var token = await localStorageService.GetItemAsync("authToken");
+        string? token = await localStorage.GetItemAsync("authToken");
 
         if (string.IsNullOrEmpty(token))
         {
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
         }
 
-        var claims = new[]
-        {
-            new Claim(ClaimTypes.Name, "User")
-        };
+        Claim[] claims =
+        [
+            new(ClaimTypes.Name, "User")
+        ];
 
-        var identity = new ClaimsIdentity(claims, "jwt");
-        var user = new ClaimsPrincipal(identity);
+        ClaimsIdentity identity = new(claims, "jwt");
+        ClaimsPrincipal user = new(identity);
         return new AuthenticationState(user);
     }
 
-    public void MarkUserAsAuthenticated(string email)
+    public async Task MarkUserAsAuthenticatedAsync(string email, string token)
     {
-        var claims = new[]
-        {
-            new Claim(ClaimTypes.Name, email)
-        };
+        await localStorage.SetItemAsync("authToken", token);
 
-        var identity = new ClaimsIdentity(claims, "jwt");
-        var user = new ClaimsPrincipal(identity);
+        Claim[] claims =
+        [
+            new(ClaimTypes.Name, email)
+        ];
+
+        ClaimsIdentity identity = new(claims, "jwt");
+        ClaimsPrincipal user = new(identity);
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
     }
 
     public async Task MarkUserAsLoggedOutAsync()
     {
-        await localStorageService.RemoveItemAsync("authToken");
+        await localStorage.RemoveItemAsync("authToken");
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(new ClaimsPrincipal())));
+    }
+
+    public async Task AddAuthorizationToken(HttpRequestHeaders requestHeaders)
+    {
+        string? token = await localStorage.GetItemAsync("authToken");
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            requestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
     }
 }

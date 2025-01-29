@@ -11,14 +11,14 @@ public class UserRepository(string connectionString) : IUserRepository
     public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
     {
         using SqlConnection connection = new(connectionString);
-        using var command = new SqlCommand("sp_GetUserByEmail", connection)
+        using SqlCommand command = new("sp_GetUserByEmail", connection)
         {
             CommandType = CommandType.StoredProcedure
         };
         command.Parameters.AddWithValue("@Email", email);
 
         await connection.OpenAsync(cancellationToken);
-        using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        using SqlDataReader reader = await command.ExecuteReaderAsync(cancellationToken);
 
         if (await reader.ReadAsync(cancellationToken))
         {
@@ -35,8 +35,8 @@ public class UserRepository(string connectionString) : IUserRepository
 
     public async Task<bool> CreateUserAsync(User user, CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(connectionString);
-        using var command = new SqlCommand("sp_CreateUser", connection)
+        using SqlConnection connection = new(connectionString);
+        using SqlCommand command = new("sp_CreateUser", connection)
         {
             CommandType = CommandType.StoredProcedure
         };
@@ -45,23 +45,23 @@ public class UserRepository(string connectionString) : IUserRepository
         command.Parameters.AddWithValue("@PasswordHash", user.PasswordHash);
 
         await connection.OpenAsync(cancellationToken);
-        var rowsAffected = await command.ExecuteNonQueryAsync(cancellationToken);
+        int rowsAffected = await command.ExecuteNonQueryAsync(cancellationToken);
         return rowsAffected > 0;
     }
 
     public async Task<IEnumerable<User>> GetAllExceptAsync(Guid excludedUserId, CancellationToken cancellationToken)
     {
-        var users = new List<User>();
+        List<User> users = [];
 
-        using var connection = new SqlConnection(connectionString);
-        using var command = new SqlCommand("sp_GetAllUsersExcept", connection)
+        using SqlConnection connection = new(connectionString);
+        using SqlCommand command = new("sp_GetAllUsersExcept", connection)
         {
             CommandType = CommandType.StoredProcedure
         };
         command.Parameters.AddWithValue("@ExcludedUserId", excludedUserId);
 
         await connection.OpenAsync(cancellationToken);
-        using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        using SqlDataReader reader = await command.ExecuteReaderAsync(cancellationToken);
 
         while (await reader.ReadAsync(cancellationToken))
         {
