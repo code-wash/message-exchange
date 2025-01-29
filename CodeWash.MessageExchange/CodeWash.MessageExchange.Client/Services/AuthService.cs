@@ -30,10 +30,14 @@ public class AuthService(IHttpClientFactory httpClientFactory, AuthenticationSta
         return true;
     }
 
-    public async Task LogoutAsync()
+    public async Task<bool> LogoutAsync()
     {
+        HttpResponseMessage response = await httpClient.PostAsync("api/auth/logout", null);
+
         await authenticationStateProvider.MarkUserAsLoggedOutAsync();
         httpClient.DefaultRequestHeaders.Authorization = null;
+
+        return response.IsSuccessStatusCode;
     }
 
     public async Task<bool> RegisterAsync(string email, string password)

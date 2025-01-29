@@ -1,7 +1,9 @@
 ﻿@page "/messages"
+@using CodeWash.MessageExchange.Client.Services
 @using CodeWash.MessageExchange.Dtos.QueryDtos
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
+@using Microsoft.AspNetCore.SignalR.Client
 @inject Services.UserService UserService
 @inject Services.MessageService MessageService
 @inject AuthenticationStateProvider AuthProvider
@@ -30,24 +32,33 @@
                 <MudText Typo="Typo.h6">Chat with @_selectedRecipient.Email</MudText>
                 <MudDivider Class="mb-3" />
 
-                <!-- Messages List -->
-                <MudList T="GetMessagesBetweenUsersVM" Style="height: 400px; overflow-y: auto;">
-                    @foreach (var message in _messages)
-                    {
-                        <MudListItem Class="@GetMessageClass(message.SenderEmail)">
-                            <MudText>@message.Content</MudText>
-                            <MudText Typo="Typo.caption" Class="text-muted timestamp">
-                                @message.Timestamp.ToString("HH:mm")
-                            </MudText>
-                        </MudListItem>
-                    }
-                </MudList>
-
                 <!-- Message Input -->
                 <MudTextField @bind-Value="_newMessage" Label="Type a message..." Adornment="Adornment.End" />
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SendMessage">
                     @(_messageIsSending ? "Sending..." : "Send")
                 </MudButton>
+
+                <!-- Messages List -->
+                <MudList T="GetMessagesBetweenUsersVM" Style="height: 400px; overflow-y: auto;">
+                    @if (_messagesIsLoading)
+                    {
+                        <MudListItem Class="message-item">
+                            <MudText>(Loading messages...)</MudText>
+                        </MudListItem>
+                    }
+                    else
+                    {
+                        foreach (var message in _messages)
+                        {
+                            <MudListItem Class="@GetMessageClass(message.SenderEmail)">
+                                <MudText>@message.Content</MudText>
+                                <MudText Typo="Typo.caption" Class="text-muted timestamp">
+                                    @message.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")
+                                </MudText>
+                            </MudListItem>
+                        }
+                    }
+                </MudList>
             }
             else
             {
@@ -65,13 +76,51 @@
     private bool _messagesIsLoading = false;
     private bool _messageIsSending = false;
     private string _currentUserEmail = string.Empty;
+    private HubConnection? hubConnection;
 
     protected override async Task OnInitializedAsync()
     {
-        _users = await UserService.GetUsersExceptCurrentAsync();
-
         var authState = await AuthProvider.GetAuthenticationStateAsync();
         _currentUserEmail = authState.User.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty;
+
+        _users = await UserService.GetUsersExceptCurrentAsync();
+
+        // await MessageService.StartConnectionAsync();
+        // MessageService.OnMessageReceived += HandleIncomingMessage;
+
+        if (hubConnection is null)
+        {
+            var token = await ((CustomAuthStateProvider)AuthProvider).GetTokenAsync();
+            
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl($"https://localhost:7216/messageHub", options =>
+                {
+                    options.AccessTokenProvider = () => Task.FromResult(token);
+                })
+                .WithAutomaticReconnect()
+                .Build();
+
+            hubConnection.On<string, string, string>("ReceiveMessage", HandleIncomingMessage);
+        }
+
+        if (hubConnection.State == HubConnectionState.Disconnected)
+        {
+            Console.WriteLine("Starting SignalR connection...");
+            await hubConnection.StartAsync();
+            Console.WriteLine("SignalR Connected!");
+        }
+    }
+
+    private void HandleIncomingMessage(string senderEmail, string message, string timestamp)
+    {
+        Console.WriteLine($"[SignalR] Received message from {senderEmail}: {message} at {timestamp}");
+        
+        if (_selectedRecipient != null && _selectedRecipient.Email == senderEmail)
+        {
+            bool isParsed = DateTime.TryParse(timestamp, out DateTime parsedTimestamp);
+            _messages.Add(new GetMessagesBetweenUsersVM(message, isParsed ? parsedTimestamp : DateTime.UtcNow, senderEmail));
+            StateHasChanged();
+        }
     }
 
     private async Task SelectUser(GetUsersExceptCurrentVM user)
@@ -131,17 +180,17 @@
     }
 
     .sent-message {
-        background-color: #d4f8c6; /* Light green */
+        background-color: #d4f8c6;
         align-self: flex-end;
         float: right;
-        text-align: left; /* ✅ Fix: Align text left inside bubble */
+        text-align: left;
     }
 
     .received-message {
-        background-color: #ffffff; /* White */
+        background-color: #ffffff;
         border: 1px solid #ccc;
         align-self: flex-start;
         float: left;
-        text-align: left; /* ✅ Align text left for consistency */
+        text-align: left;
     }
     </style>

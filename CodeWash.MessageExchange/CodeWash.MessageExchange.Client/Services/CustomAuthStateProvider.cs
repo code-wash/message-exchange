@@ -10,9 +10,14 @@ public class CustomAuthStateProvider(LocalStorage localStorage) : Authentication
     private readonly LocalStorage localStorage = localStorage;
     private const string AuthTokenKey = "authToken";
 
+    public async Task<string?> GetTokenAsync()
+    {
+        return await localStorage.GetItemAsync(AuthTokenKey);
+    }
+
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        string? token = await localStorage.GetItemAsync(AuthTokenKey);
+        string? token = await GetTokenAsync();
 
         if (string.IsNullOrEmpty(token))
         {
@@ -30,6 +35,7 @@ public class CustomAuthStateProvider(LocalStorage localStorage) : Authentication
 
         Claim[] claims =
         [
+            new(ClaimTypes.NameIdentifier, emailClaim),
             new(ClaimTypes.Email, emailClaim)
         ];
 
@@ -60,7 +66,7 @@ public class CustomAuthStateProvider(LocalStorage localStorage) : Authentication
 
     public async Task AddAuthorizationToken(HttpRequestHeaders requestHeaders)
     {
-        string? token = await localStorage.GetItemAsync(AuthTokenKey);
+        string? token = await GetTokenAsync();
 
         if (!string.IsNullOrEmpty(token))
         {

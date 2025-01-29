@@ -3,7 +3,9 @@ using CodeWash.MessageExchange.DataAccess.StoredProcedures.Commands;
 using CodeWash.MessageExchange.DataAccess.StoredProcedures.Queries;
 using CodeWash.MessageExchange.Domain.Entities;
 using CodeWash.MessageExchange.Dtos.ApiDtos.AuthDtos;
+using CodeWash.MessageExchange.Dtos.NonQueryDtos;
 using CodeWash.MessageExchange.Dtos.QueryDtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -66,6 +68,15 @@ public class AuthController(IDbConnector dbConnector, IConfiguration configurati
         return Ok("User registered successfully.");
     }
 
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout(CancellationToken cancellationToken)
+    {
+        await dbConnector.ExecuteCommandAsync(new DisconnectUserSP(new DisconnectUserVM(CurrentUserEmail!, DateTime.UtcNow)), cancellationToken);
+
+        return Ok();
+    }
+
     private static string GenerateJwtToken(string email, IConfiguration configuration)
     {
         byte[] key = Encoding.UTF8.GetBytes(configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT key is missing"));
@@ -74,6 +85,7 @@ public class AuthController(IDbConnector dbConnector, IConfiguration configurati
 
         Claim[] claims =
         [
+            new(ClaimTypes.NameIdentifier, email),
             new(ClaimTypes.Email, email)
         ];
 

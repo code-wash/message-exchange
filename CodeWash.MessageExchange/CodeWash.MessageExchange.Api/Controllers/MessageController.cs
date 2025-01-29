@@ -1,4 +1,5 @@
-﻿using CodeWash.MessageExchange.DataAccess.Contracts;
+﻿using CodeWash.MessageExchange.Api.Hubs;
+using CodeWash.MessageExchange.DataAccess.Contracts;
 using CodeWash.MessageExchange.DataAccess.StoredProcedures.Commands;
 using CodeWash.MessageExchange.DataAccess.StoredProcedures.Queries;
 using CodeWash.MessageExchange.Domain.Entities;
@@ -6,6 +7,7 @@ using CodeWash.MessageExchange.Dtos.ApiDtos.MessageDtos;
 using CodeWash.MessageExchange.Dtos.QueryDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
 namespace CodeWash.MessageExchange.Api.Controllers;
@@ -13,7 +15,7 @@ namespace CodeWash.MessageExchange.Api.Controllers;
 [Route("api/messages")]
 [ApiController]
 [Authorize]
-public class MessageController(IDbConnector dbConnector) : BaseApiController
+public class MessageController(IDbConnector dbConnector, IHubContext<MessageHub> hubContext) : BaseApiController
 {
     [HttpGet("between-users")]
     public async Task<IActionResult> GetMessagesBetweenUsersAsync([FromQuery] GetMessagesBetweenUsersRequestDto requestDto, CancellationToken cancellationToken)
@@ -64,9 +66,16 @@ public class MessageController(IDbConnector dbConnector) : BaseApiController
         CreateMessageSP createMessageSP = new(message);
         int rowsAffected = await dbConnector.ExecuteCommandAsync(createMessageSP, cancellationToken);
 
-        return rowsAffected > 0 
-            ? Ok("Message sent successfully.") 
-            : StatusCode(500, "Failed to send message.");
+        if (rowsAffected == 0)
+        {
+            return StatusCode(500, "Failed to send message.");
+        }
+
+        string timestamp = message.Timestamp.ToString("yyyy-MM-dd HH:mm:ss");
+        await hubContext.Clients.Group(request.ReceiverEmail)
+            .SendAsync("ReceiveMessage", CurrentUserEmail, request.Content, timestamp, cancellationToken);
+
+        return Ok("Message sent successfully.");
     }
 
     private async Task<Guid> GetUserIdByEmailAsync(string email, CancellationToken cancellationToken)

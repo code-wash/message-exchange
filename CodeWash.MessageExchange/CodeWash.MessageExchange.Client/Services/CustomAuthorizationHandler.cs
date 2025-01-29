@@ -7,7 +7,6 @@ namespace CodeWash.MessageExchange.Client.Services;
 public class CustomAuthorizationHandler(AuthenticationStateProvider authenticationStateProvider, NavigationManager navigation) : DelegatingHandler
 {
     private readonly CustomAuthStateProvider authenticationStateProvider = (CustomAuthStateProvider)authenticationStateProvider;
-    private readonly NavigationManager navigation = navigation;
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
