@@ -5,6 +5,7 @@ using System.Data;
 
 namespace CodeWash.MessageExchange.DataAccess.Repositories;
 
+[Obsolete]
 public class UserRepository(string connectionString) : IUserRepository
 {
     public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)

@@ -5,6 +5,7 @@ using System.Data;
 
 namespace CodeWash.MessageExchange.DataAccess.Repositories;
 
+[Obsolete]
 public class ConnectionRepository(string connectionString) : IConnectionRepository
 {
     public async Task<bool> CreateConnectionAsync(Connection connection, CancellationToken cancellationToken)

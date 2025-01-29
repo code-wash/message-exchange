@@ -5,6 +5,7 @@ using System.Data;
 
 namespace CodeWash.MessageExchange.DataAccess.Repositories;
 
+[Obsolete]
 public class MessageRepository(string connectionString) : IMessageRepository
 {
     public async Task<IEnumerable<Message>> GetMessagesBetweenUsersAsync(Guid userId1, Guid userId2, CancellationToken cancellationToken)

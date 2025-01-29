@@ -1,8 +1,10 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using CodeWash.MessageExchange.Dtos.QueryDtos;
+using Microsoft.Data.SqlClient;
 using System.Data;
 
 namespace CodeWash.MessageExchange.DataAccess.Contracts;
 public abstract class QuerySP<T> : BaseSP
+    where T : IQueryVM
 {
     public abstract T ReadEntity(SqlDataReader reader);
 
