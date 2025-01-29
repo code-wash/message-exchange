@@ -3,7 +3,6 @@ using CodeWash.MessageExchange.DataAccess.StoredProcedures.Queries;
 using CodeWash.MessageExchange.Dtos.QueryDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace CodeWash.MessageExchange.Api.Controllers;
 

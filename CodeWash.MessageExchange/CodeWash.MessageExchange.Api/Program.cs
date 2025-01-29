@@ -8,11 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton(builder.Configuration);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 builder.Services.AddCors(setup =>
@@ -24,7 +21,7 @@ builder.Services.AddCors(setup =>
         .AllowCredentials());
 });
 
-// Add JWT Authentication
+// NOTE: Add JWT Authentication
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -51,7 +48,6 @@ app.UseMiddleware<ErrorHandlerMiddleware>();
 
 app.UseCors();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
