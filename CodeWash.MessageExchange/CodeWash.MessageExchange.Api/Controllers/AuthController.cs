@@ -1,8 +1,8 @@
-using CodeWash.MessageExchange.Api.Dtos.AuthDtos;
 using CodeWash.MessageExchange.DataAccess.Contracts;
 using CodeWash.MessageExchange.DataAccess.StoredProcedures.Commands;
 using CodeWash.MessageExchange.DataAccess.StoredProcedures.Queries;
 using CodeWash.MessageExchange.Domain.Entities;
+using CodeWash.MessageExchange.Dtos.ApiDtos.AuthDtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

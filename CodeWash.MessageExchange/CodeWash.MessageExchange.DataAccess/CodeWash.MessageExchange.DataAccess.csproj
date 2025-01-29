@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CodeWash.MessageExchange.Domain\CodeWash.MessageExchange.Domain.csproj" />
+    <ProjectReference Include="..\CodeWash.MessageExchange.Dtos\CodeWash.MessageExchange.Dtos.csproj" />
   </ItemGroup>
 
 </Project>

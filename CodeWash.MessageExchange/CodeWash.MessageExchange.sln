@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWash.MessageExchange.Cl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWash.MessageExchange.Api", "CodeWash.MessageExchange.Api\CodeWash.MessageExchange.Api.csproj", "{3074093D-C287-4D82-9756-C66008B775FD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWash.MessageExchange.Dtos", "CodeWash.MessageExchange.Dtos\CodeWash.MessageExchange.Dtos.csproj", "{305E5A8D-CAED-42B5-AB4D-80553502FD2C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{3074093D-C287-4D82-9756-C66008B775FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3074093D-C287-4D82-9756-C66008B775FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3074093D-C287-4D82-9756-C66008B775FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{305E5A8D-CAED-42B5-AB4D-80553502FD2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{305E5A8D-CAED-42B5-AB4D-80553502FD2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{305E5A8D-CAED-42B5-AB4D-80553502FD2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{305E5A8D-CAED-42B5-AB4D-80553502FD2C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -81,3 +81,18 @@ BEGIN
     SET DisconnectedAt = @DisconnectedAt
     WHERE Id = @Id AND DisconnectedAt IS NULL;
 END;
+
+GO
+
+CREATE PROCEDURE sp_GetUsersExceptCurrent
+    @CurrentUserEmail NVARCHAR(MAX)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT Id, Email
+    FROM Users
+    WHERE Email <> @CurrentUserEmail
+    ORDER BY Email;
+END;
+

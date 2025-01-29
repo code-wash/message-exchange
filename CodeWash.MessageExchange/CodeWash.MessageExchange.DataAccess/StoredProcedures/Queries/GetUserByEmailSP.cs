@@ -1,10 +1,10 @@
 ﻿using CodeWash.MessageExchange.DataAccess.Contracts;
-using CodeWash.MessageExchange.Domain.Entities;
+using CodeWash.MessageExchange.Dtos.QueryDtos;
 using Microsoft.Data.SqlClient;
 
 namespace CodeWash.MessageExchange.DataAccess.StoredProcedures.Queries;
 
-public class GetUserByEmailSP(string email) : QuerySP<User>
+public class GetUserByEmailSP(string email) : QuerySP<GetUserByEmailVM>
 {
     public override string ProcedureName => "sp_GetUserByEmail";
 
@@ -13,13 +13,13 @@ public class GetUserByEmailSP(string email) : QuerySP<User>
         { "@Email", email },
     };
 
-    public override User ReadEntity(SqlDataReader reader)
+    public override GetUserByEmailVM ReadEntity(SqlDataReader reader)
     {
-        return new User
-        {
-            Id = reader.GetGuid(reader.GetOrdinal("Id")),
-            Email = reader.GetString(reader.GetOrdinal("Email")),
-            PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash"))
-        };
+        return new GetUserByEmailVM
+        (
+            Id: reader.GetGuid(reader.GetOrdinal("Id")),
+            Email: reader.GetString(reader.GetOrdinal("Email")),
+            PasswordHash: reader.GetString(reader.GetOrdinal("PasswordHash"))
+        );
     }
 }

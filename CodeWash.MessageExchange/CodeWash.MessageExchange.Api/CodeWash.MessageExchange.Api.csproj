@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CodeWash.MessageExchange.DataAccess\CodeWash.MessageExchange.DataAccess.csproj" />
+    <ProjectReference Include="..\CodeWash.MessageExchange.Dtos\CodeWash.MessageExchange.Dtos.csproj" />
   </ItemGroup>
 
 </Project>

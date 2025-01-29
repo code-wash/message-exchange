@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using CodeWash.MessageExchange.Dtos.ApiDtos.AuthDtos;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace CodeWash.MessageExchange.Client.Services;
@@ -8,11 +9,7 @@ public class AuthService(HttpClient httpClient, AuthenticationStateProvider auth
 {
     public async Task<bool> LoginAsync(string email, string password)
     {
-        var loginRequest = new
-        {
-            Email = email,
-            Password = password,
-        };
+        LoginRequestDto loginRequest = new(Email: email, Password: password);
 
         HttpResponseMessage response = await httpClient.PostAsJsonAsync("api/auth/login", loginRequest);
 
@@ -39,7 +36,7 @@ public class AuthService(HttpClient httpClient, AuthenticationStateProvider auth
 
     public async Task<bool> RegisterAsync(string email, string password)
     {
-        var registerRequest = new { Email = email, Password = password };
+        RegisterRequestDto registerRequest = new(Email: email, Password: password);
         HttpResponseMessage response = await httpClient.PostAsJsonAsync("api/auth/register", registerRequest);
 
         return response.IsSuccessStatusCode;

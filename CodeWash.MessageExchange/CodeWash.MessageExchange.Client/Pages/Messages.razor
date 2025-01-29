@@ -1,23 +1,77 @@
 ﻿@page "/messages"
+@using CodeWash.MessageExchange.Dtos.QueryDtos
+@using Microsoft.AspNetCore.Components.Authorization
+@inject Services.UserService UserService
+@inject AuthenticationStateProvider AuthProvider
 
-<MudPaper Elevation="4" Class="pa-4">
-    <MudText Typo="Typo.h5">Message Exchange</MudText>
+<MudGrid>
+    <!-- Left Panel: User List (20% width) -->
+    <MudItem xs="12" sm="3" md="3" lg="2">
+        <MudPaper Elevation="4" Class="pa-2" Style="height: 100vh; overflow-y: auto;">
+            <MudText Typo="Typo.h6" Class="mb-2">Users</MudText>
+            <MudList T="GetUsersExceptCurrentVM">
+                @foreach (var user in _users)
+                {
+                    <MudListItem Class="user-list-item" @onclick="() => SelectUser(user)">
+                        <MudText>@user.Email</MudText>
+                    </MudListItem>
+                }
+            </MudList>
+        </MudPaper>
+    </MudItem>
 
-    <MudTextField @bind-Value="_message" Label="Message" Class="mb-4" />
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SendMessage">Send</MudButton>
-</MudPaper>
+    <!-- Right Panel: Chat Area (80% width) -->
+    <MudItem xs="12" sm="9" md="9" lg="10">
+        <MudPaper Elevation="4" Class="pa-4">
+            @if (_selectedRecipient != null)
+            {
+                <MudText Typo="Typo.h6">Chat with @_selectedRecipient.Email</MudText>
+                <MudDivider Class="mb-3" />
+
+                <!-- Messages List -->
+                <MudList T="string" Style="height: 400px; overflow-y: auto;">
+                    @foreach (var msg in _messages)
+                    {
+                        <MudListItem Class="message-item">
+                            <MudText>@msg</MudText>
+                        </MudListItem>
+                    }
+                </MudList>
+
+                <!-- Message Input -->
+                <MudTextField @bind-Value="_message" Label="Type a message..." Adornment="Adornment.End" />
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SendMessage">Send</MudButton>
+            }
+            else
+            {
+                <MudText Typo="Typo.subtitle1" Class="text-center">Select a user to start chatting</MudText>
+            }
+        </MudPaper>
+    </MudItem>
+</MudGrid>
 
 @code {
-    private List<string> _users = new() { "User1", "User2", "User3" };
-    private string? _selectedRecipient;
+    private List<GetUsersExceptCurrentVM> _users = [];
+    private GetUsersExceptCurrentVM? _selectedRecipient;
     private string _message = string.Empty;
-    private List<string> _messages = new();
+    private List<string> _messages = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _users = await UserService.GetUsersExceptCurrentAsync();
+    }
+
+    private void SelectUser(GetUsersExceptCurrentVM user)
+    {
+        _selectedRecipient = user;
+        _messages.Clear();
+    }
 
     private async Task SendMessage()
     {
-        if (!string.IsNullOrEmpty(_selectedRecipient) && !string.IsNullOrEmpty(_message))
+        if (!string.IsNullOrEmpty(_message) && _selectedRecipient != null)
         {
-            _messages.Add($"To {_selectedRecipient}: {_message}");
+            _messages.Add($"You: {_message}");
             _message = string.Empty;
         }
     }

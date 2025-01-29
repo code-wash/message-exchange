@@ -1,5 +1,4 @@
-﻿using System.Data;
-using CodeWash.MessageExchange.DataAccess.Contracts;
+﻿using CodeWash.MessageExchange.DataAccess.Contracts;
 using Microsoft.Extensions.Configuration;
 
 namespace CodeWash.MessageExchange.DataAccess;
