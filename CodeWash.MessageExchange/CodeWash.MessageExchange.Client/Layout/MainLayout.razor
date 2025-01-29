@@ -29,13 +29,13 @@
         <MudText Typo="Typo.h6">Message Exchange</MudText>
         <MudSpacer />
         @if (isUserLoggedIn){
-            <MudButton Variant="Variant.Text" Class="mud-theme-primary">Messages</MudButton>
+            <MudButton Variant="Variant.Text" Class="mud-theme-primary" OnClick="@(() => Nav.NavigateTo("/messages"))">Messages</MudButton>
             <MudSpacer />
             <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="Logout">Logout</MudButton>
         } else {
             <MudButton Variant="Variant.Text" Color="Color.Success">Login</MudButton>
             <MudSpacer />
-            <MudButton Variant="Variant.Text" Class="mud-theme-primary">Register</MudButton>
+            <MudButton Variant="Variant.Text" Class="mud-theme-primary" OnClick="@(() => Nav.NavigateTo("/register"))">Register</MudButton>
         }
     </MudAppBar>
 

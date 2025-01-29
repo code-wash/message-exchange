@@ -1,0 +1,45 @@
+﻿@page "/register"
+@using MudBlazor
+@inject Services.AuthService AuthService
+@inject NavigationManager Nav
+
+<MudPaper Elevation="4" Class="pa-4">
+    <MudText Typo="Typo.h5" Class="mb-4">Register</MudText>
+
+    <MudTextField Label="Email" @bind-Value="email" />
+    <MudTextField Label="Password" @bind-Value="password" InputType="InputType.Password" />
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleRegister" Disabled="isLoading">
+        @(isLoading ? "Registering..." : "REGISTER")
+    </MudButton>
+
+    <MudAlert Severity="Severity.Error" Style="margin-top: 10px;" @bind-Visible="showError">
+        Registration failed. Try again!
+    </MudAlert>
+</MudPaper>
+
+@code {
+    private string email = string.Empty;
+    private string password = string.Empty;
+    private bool isLoading = false;
+    private bool showError = false;
+
+    private async Task HandleRegister()
+    {
+        isLoading = true;
+        showError = false;
+
+        var success = await AuthService.RegisterAsync(email, password);
+
+        if (success)
+        {
+            Nav.NavigateTo("/login", true);
+        }
+        else
+        {
+            showError = true;
+        }
+
+        isLoading = false;
+    }
+}

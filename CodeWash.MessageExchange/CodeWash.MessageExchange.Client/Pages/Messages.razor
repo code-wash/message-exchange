@@ -1,29 +1,10 @@
 ﻿@page "/messages"
-@using MudBlazor
 
 <MudPaper Elevation="4" Class="pa-4">
     <MudText Typo="Typo.h5">Message Exchange</MudText>
 
-    <MudSelect T="string" Label="Select Recipient" @bind-Value="_selectedRecipient">
-        @foreach (var user in _users)
-        {
-            <MudSelectItem Value="@user">@user</MudSelectItem>
-        }
-    </MudSelect>
-
     <MudTextField @bind-Value="_message" Label="Message" Class="mb-4" />
     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SendMessage">Send</MudButton>
-
-    <MudList T="string">
-        @foreach (var msg in _messages)
-        {
-            <MudListItem>
-                <MudText>@msg</MudText>
-            </MudListItem>
-        }
-    </MudList>
-
-    <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="Logout">Logout</MudButton>
 </MudPaper>
 
 @code {
@@ -39,10 +20,5 @@
             _messages.Add($"To {_selectedRecipient}: {_message}");
             _message = string.Empty;
         }
-    }
-
-    private async Task Logout()
-    {
-        Console.WriteLine("User logged out.");
     }
 }

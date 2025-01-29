@@ -8,11 +8,24 @@ Welcome to your new app.
  *@
 
 @page "/"
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager Nav
 
 @code {
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        Nav.NavigateTo("/login", true);
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var isUserLoggedIn = authState.User.Identity?.IsAuthenticated ?? false;
+
+        if (isUserLoggedIn)
+        {
+            Nav.NavigateTo("/messages", true);
+        }
+        else
+        {
+            Nav.NavigateTo("/login", true);
+        }
+
     }
 }

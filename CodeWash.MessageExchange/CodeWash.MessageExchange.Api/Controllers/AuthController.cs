@@ -15,9 +15,6 @@ namespace CodeWash.MessageExchange.Api.Controllers;
 [Route("api/auth")]
 public class AuthController(IDbConnector dbConnector, IConfiguration configuration) : ControllerBase
 {
-    private readonly IDbConnector dbConnector = dbConnector;
-    private readonly IConfiguration configuration = configuration;
-
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto request, CancellationToken cancellationToken)
     {
@@ -38,9 +35,37 @@ public class AuthController(IDbConnector dbConnector, IConfiguration configurati
         var token = GenerateJwtToken(user.Email, configuration);
 
         // Register user connection
-        await dbConnector.ExecuteCommandAsync(new AddConnectionSP(new Connection { UserId = user.Id }), cancellationToken);
+        await dbConnector.ExecuteCommandAsync(new CreateConnectionSP(new Connection { UserId = user.Id }), cancellationToken);
 
         return Ok(token);
+    }
+
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequestDto request, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+        {
+            return BadRequest("Email and password are required.");
+        }
+
+        // NOTE: Check if the user already exists
+        var existingUsers = await dbConnector.ExecuteQueryAsync(new GetUserByEmailSP(request.Email), cancellationToken);
+        if (existingUsers.Count != 0)
+        {
+            return Conflict("User with this email already exists.");
+        }
+
+        string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
+        User newUser = new()
+        {
+            Email = request.Email,
+            PasswordHash = passwordHash
+        };
+
+        await dbConnector.ExecuteCommandAsync(new CreateUserSP(newUser), cancellationToken);
+
+        return Ok("User registered successfully.");
     }
 
     private static string GenerateJwtToken(string email, IConfiguration configuration)

@@ -3,9 +3,9 @@ using CodeWash.MessageExchange.Domain.Entities;
 
 namespace CodeWash.MessageExchange.DataAccess.StoredProcedures.Commands;
 
-public class AddUserSP(User user) : NonQuerySP
+public class CreateUserSP(User user) : NonQuerySP
 {
-    public override string ProcedureName => "sp_AddUser";
+    public override string ProcedureName => "sp_CreateUser";
 
     public override Dictionary<string, object> Parameters => new()
     {

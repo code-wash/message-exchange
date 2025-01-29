@@ -6,10 +6,6 @@ namespace CodeWash.MessageExchange.Client.Services;
 
 public class AuthService(HttpClient httpClient, AuthenticationStateProvider authStateProvider, LocalStorageService localStorage)
 {
-    private readonly HttpClient httpClient = httpClient;
-    private readonly AuthenticationStateProvider authStateProvider = authStateProvider;
-    private readonly LocalStorageService localStorage = localStorage;
-
     public async Task<bool> LoginAsync(string email, string password)
     {
         var loginRequest = new
@@ -40,4 +36,13 @@ public class AuthService(HttpClient httpClient, AuthenticationStateProvider auth
         await ((CustomAuthStateProvider)authStateProvider).MarkUserAsLoggedOutAsync();
         httpClient.DefaultRequestHeaders.Authorization = null;
     }
+
+    public async Task<bool> RegisterAsync(string email, string password)
+    {
+        var registerRequest = new { Email = email, Password = password };
+        HttpResponseMessage response = await httpClient.PostAsJsonAsync("api/auth/register", registerRequest);
+
+        return response.IsSuccessStatusCode;
+    }
+
 }

@@ -32,10 +32,10 @@ public class UserRepository(string connectionString) : IUserRepository
         return null;
     }
 
-    public async Task<bool> AddAsync(User user, CancellationToken cancellationToken)
+    public async Task<bool> CreateUserAsync(User user, CancellationToken cancellationToken)
     {
         using var connection = new SqlConnection(connectionString);
-        using var command = new SqlCommand("sp_AddUser", connection)
+        using var command = new SqlCommand("sp_CreateUser", connection)
         {
             CommandType = CommandType.StoredProcedure
         };

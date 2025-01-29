@@ -3,9 +3,9 @@ using CodeWash.MessageExchange.Domain.Entities;
 
 namespace CodeWash.MessageExchange.DataAccess.StoredProcedures.Commands;
 
-public class AddConnectionSP(Connection connection) : NonQuerySP
+public class CreateConnectionSP(Connection connection) : NonQuerySP
 {
-    public override string ProcedureName => "sp_AddConnection";
+    public override string ProcedureName => "sp_CreateConnection";
 
     public override Dictionary<string, object> Parameters => new()
     {

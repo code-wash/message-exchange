@@ -7,10 +7,10 @@ namespace CodeWash.MessageExchange.DataAccess.Repositories;
 
 public class ConnectionRepository(string connectionString) : IConnectionRepository
 {
-    public async Task<bool> AddConnectionAsync(Connection connection, CancellationToken cancellationToken)
+    public async Task<bool> CreateConnectionAsync(Connection connection, CancellationToken cancellationToken)
     {
         using var sqlConnection = new SqlConnection(connectionString);
-        using var command = new SqlCommand("sp_AddConnection", sqlConnection)
+        using var command = new SqlCommand("sp_CreateConnection", sqlConnection)
         {
             CommandType = CommandType.StoredProcedure
         };

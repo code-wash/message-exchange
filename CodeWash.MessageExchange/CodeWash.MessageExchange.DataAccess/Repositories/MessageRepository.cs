@@ -38,10 +38,10 @@ public class MessageRepository(string connectionString) : IMessageRepository
         return messages;
     }
 
-    public async Task<bool> AddMessageAsync(Message message, CancellationToken cancellationToken)
+    public async Task<bool> CreateMessageAsync(Message message, CancellationToken cancellationToken)
     {
         using var connection = new SqlConnection(connectionString);
-        using var command = new SqlCommand("sp_AddMessage", connection)
+        using var command = new SqlCommand("sp_CreateMessage", connection)
         {
             CommandType = CommandType.StoredProcedure
         };

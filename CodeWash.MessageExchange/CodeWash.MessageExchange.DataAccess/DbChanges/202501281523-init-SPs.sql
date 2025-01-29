@@ -1,4 +1,4 @@
-CREATE PROCEDURE sp_AddUser
+CREATE PROCEDURE sp_CreateUser
     @Id UNIQUEIDENTIFIER,
     @Email NVARCHAR(256),
     @PasswordHash NVARCHAR(256)
@@ -21,7 +21,7 @@ END;
 
 GO
 
-CREATE PROCEDURE sp_AddMessage
+CREATE PROCEDURE sp_CreateMessage
     @Id UNIQUEIDENTIFIER,
     @SenderId UNIQUEIDENTIFIER,
     @ReceiverId UNIQUEIDENTIFIER,
@@ -60,7 +60,7 @@ END;
 
 GO
 
-CREATE PROCEDURE sp_AddConnection
+CREATE PROCEDURE sp_CreateConnection
     @Id UNIQUEIDENTIFIER,
     @UserId UNIQUEIDENTIFIER,
     @ConnectedAt DATETIME

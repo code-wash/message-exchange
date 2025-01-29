@@ -3,9 +3,9 @@ using CodeWash.MessageExchange.Domain.Entities;
 
 namespace CodeWash.MessageExchange.DataAccess.StoredProcedures.Commands;
 
-public class AddMessageSP(Message message) : NonQuerySP
+public class CreateMessageSP(Message message) : NonQuerySP
 {
-    public override string ProcedureName => "sp_AddMessage";
+    public override string ProcedureName => "sp_CreateMessage";
 
     public override Dictionary<string, object> Parameters => new()
     {
