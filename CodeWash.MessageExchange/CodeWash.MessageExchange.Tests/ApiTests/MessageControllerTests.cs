@@ -41,9 +41,6 @@ public class MessageControllerTests
         {
             HttpContext = new DefaultHttpContext { User = _mockUser }
         };
-
-        // Mock HubContext to simulate real-time messaging
-        _hubContextMock.Setup(h => h.Clients.Group(It.IsAny<string>())).Returns(_clientProxyMock.Object);
     }
 
     [Test]

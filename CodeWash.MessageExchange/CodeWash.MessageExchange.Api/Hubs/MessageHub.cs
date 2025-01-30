@@ -6,6 +6,7 @@ namespace CodeWash.MessageExchange.Api.Hubs;
 public class MessageHub : Hub
 {
     private static readonly Dictionary<string, string> _connections = [];
+    public static IReadOnlyDictionary<string, string> Connections => _connections;
 
     public override async Task OnConnectedAsync()
     {
@@ -14,7 +15,6 @@ public class MessageHub : Hub
         if (!string.IsNullOrEmpty(email))
         {
             _connections[email] = Context.ConnectionId;
-            await Groups.AddToGroupAsync(Context.ConnectionId, email);
             Console.WriteLine($"User {email} connected with ConnectionId: {Context.ConnectionId}");
         }
 
@@ -27,7 +27,6 @@ public class MessageHub : Hub
         if (!string.IsNullOrEmpty(email))
         {
             _connections.Remove(email);
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, email);
             Console.WriteLine($"User {email} disconnected.");
         }
 

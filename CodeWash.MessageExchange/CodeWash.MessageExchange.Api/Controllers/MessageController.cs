@@ -71,9 +71,12 @@ public class MessageController(IDbConnector dbConnector, IHubContext<MessageHub>
             return StatusCode(500, "Failed to send message.");
         }
 
-        string timestamp = message.Timestamp.ToString("yyyy-MM-dd HH:mm:ss");
-        await hubContext.Clients.Group(request.ReceiverEmail)
-            .SendAsync("ReceiveMessage", CurrentUserEmail, request.Content, timestamp, cancellationToken);
+        if (MessageHub.Connections.TryGetValue(request.ReceiverEmail, out string? connectionId))
+        {
+            string timestamp = message.Timestamp.ToString("yyyy-MM-dd HH:mm:ss");
+            await hubContext.Clients.Client(connectionId)
+                .SendAsync("ReceiveMessage", CurrentUserEmail, request.Content, timestamp, cancellationToken);
+        }
 
         return Ok("Message sent successfully.");
     }
