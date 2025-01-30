@@ -7,5 +7,5 @@ public interface IBaseEntity
 
 public abstract class BaseEntity : IBaseEntity
 {
-    public Guid Id { get; set; } = Guid.NewGuid(); // Unique identifier for the user
+    public Guid Id { get; set; } = Guid.NewGuid();
 }

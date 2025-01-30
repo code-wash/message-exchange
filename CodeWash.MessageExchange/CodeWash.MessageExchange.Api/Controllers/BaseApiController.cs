@@ -1,5 +1,4 @@
 ﻿using CodeWash.MessageExchange.DataAccess.StoredProcedures.Queries;
-using CodeWash.MessageExchange.DataAccess;
 using CodeWash.MessageExchange.Dtos.QueryDtos;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
