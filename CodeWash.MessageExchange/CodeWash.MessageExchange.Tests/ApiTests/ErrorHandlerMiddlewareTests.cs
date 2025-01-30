@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace CodeWash.MessageExchange.Tests;
+namespace CodeWash.MessageExchange.Tests.ApiTests;
 
 [TestFixture]
 public class ErrorHandlerMiddlewareTests
